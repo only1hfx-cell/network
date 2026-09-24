@@ -3,39 +3,537 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="A simple browser-based internet strength checker." />
-  <title>Network Pulse</title>
+  <meta name="description" content="Nigeria call-readiness and mobile network checker" />
+  <title>CallCheck Nigeria</title>
   <style>
-    :root{--bg:#07111f;--card:#102038;--text:#edf5ff;--muted:#9cb1cf;--blue:#60a5fa;--green:#34d399;--yellow:#fbbf24;--red:#f87171}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Arial,sans-serif;color:var(--text);background:radial-gradient(circle at top left,#183b67,transparent 38%),var(--bg)}
-    main{max-width:900px;margin:auto;padding:28px 18px 48px}.brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}.logo{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--blue),#4f46e5);font-weight:800;font-size:21px}.eyebrow{margin:0 0 4px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:2px}.brand h1{margin:0;font-size:25px}.card{background:rgba(16,32,56,.92);border:1px solid #ffffff1a;border-radius:22px;box-shadow:0 16px 35px #0004}.hero{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:27px;margin-bottom:20px}.tag{color:var(--green);font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:1.5px}.hero h2{margin:7px 0 8px;font-size:clamp(33px,8vw,56px);letter-spacing:-2px}.hero p{margin:0;color:var(--muted);line-height:1.5}.button{border:0;border-radius:14px;padding:15px 19px;background:linear-gradient(135deg,var(--blue),#4f46e5);color:#fff;font-weight:bold;cursor:pointer;white-space:nowrap}.button:disabled{opacity:.65;cursor:wait}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}.metric{padding:20px}.metric .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px}.value{margin:10px 0 3px;font-size:30px;font-weight:800;letter-spacing:-1px}.unit{color:var(--muted);font-size:12px}.details{display:grid;grid-template-columns:1fr 1fr;gap:16px}.details .card{padding:21px}.details h3{margin:0 0 15px}.row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #ffffff12;color:var(--muted);gap:15px}.row:last-child{border:0}.row strong{color:var(--text);text-align:right}.note{color:var(--muted);line-height:1.55;font-size:14px}.status{color:var(--green)}.notice{margin-top:20px;padding:16px 18px;color:var(--muted);line-height:1.55;font-size:14px}.notice strong{color:var(--text)}
-    @media(max-width:700px){.hero{display:block}.button{width:100%;margin-top:20px}.metrics{grid-template-columns:repeat(2,1fr)}.details{grid-template-columns:1fr}}
-    @media(max-width:380px){.metrics{grid-template-columns:1fr}}
+    :root {
+      --bg: #07111f;
+      --panel: rgba(16, 32, 56, 0.92);
+      --panel-2: rgba(19, 38, 65, 0.96);
+      --text: #edf5ff;
+      --muted: #a7badb;
+      --green: #32d399;
+      --blue: #60a5fa;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --purple: #8b5cf6;
+      --border: rgba(255,255,255,0.09);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top left, rgba(96,165,250,0.12), transparent 35%), var(--bg);
+      color: var(--text);
+    }
+
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 18px 50px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
+
+    .app {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: 0 18px 30px rgba(0,0,0,0.2);
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding: 24px 22px;
+    }
+
+    .statusWrap {
+      display: grid;
+      gap: 8px;
+    }
+
+    .tag {
+      font-size: 11px;
+      letter-spacing: 2px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--green);
+    }
+
+    .hero h2 {
+      font-size: clamp(2.2rem, 7vw, 4rem);
+      letter-spacing: -2px;
+    }
+
+    .hero .sub {
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 560px;
+    }
+
+    .button {
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--blue), #4f46e5);
+      color: white;
+      font-weight: 700;
+      padding: 16px 22px;
+      cursor: pointer;
+      min-width: 180px;
+    }
+
+    .button:disabled { opacity: 0.65; cursor: wait; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr auto;
+      gap: 12px;
+      padding: 18px 16px;
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    select, button.secondary {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 12px 14px;
+      font-size: 16px;
+    }
+
+    .secondary {
+      cursor: pointer;
+      font-weight: 700;
+      min-height: 48px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 16px;
+    }
+
+    .metric {
+      padding: 20px 18px;
+      background: var(--panel-2);
+    }
+
+    .metric .label {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .metric .value {
+      margin-top: 10px;
+      font-size: clamp(1.8rem, 2vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .metric .unit {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+    }
+
+    .details .card {
+      padding: 20px 18px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+    }
+
+    .row:last-child { border-bottom: 0; }
+    .row strong { color: var(--text); text-align: right; }
+
+    .notice {
+      padding: 16px 18px;
+      background: rgba(96,165,250,0.08);
+      border: 1px solid rgba(96,165,250,0.18);
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .notice strong { color: var(--text); }
+
+    @media (max-width: 760px) {
+      .hero { display: block; }
+      .controls { grid-template-columns: 1fr; }
+      .button { width: 100%; margin-top: 12px; }
+      .metrics { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
+      .details { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 420px) {
+      .metrics { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
   <main>
-    <header class="brand"><div class="logo">N</div><div><p class="eyebrow">Internet quality checker</p><h1>Network Pulse</h1></div></header>
-    <section class="card hero"><div><div class="tag">Live signal</div><h2 id="status">Ready to test</h2><p id="summary">Check the connection your phone is using right now.</p></div><button class="button" id="test">Run speed test</button></section>
-    <section class="metrics">
-      <article class="card metric"><div class="label">Download</div><div class="value" id="download">--</div><div class="unit">Mbps</div></article>
-      <article class="card metric"><div class="label">Upload</div><div class="value" id="upload">--</div><div class="unit">Mbps</div></article>
-      <article class="card metric"><div class="label">Ping</div><div class="value" id="ping">--</div><div class="unit">ms</div></article>
-      <article class="card metric"><div class="label">Connection</div><div class="value" id="type">--</div><div class="unit">current path</div></article>
-    </section>
-    <section class="details"><article class="card"><h3>Signal details</h3><div class="row"><span>Browser estimate</span><strong id="effective">--</strong></div><div class="row"><span>Estimated downlink</span><strong id="downlink">--</strong></div><div class="row"><span>Browser latency</span><strong id="browserPing">--</strong></div></article><article class="card"><h3>How to test your SIM</h3><p class="note">A website cannot directly read the SIM or the router’s cellular radio. To test mobile/SIM speed, turn off Wi‑Fi on your phone, make sure mobile data is on, then tap <strong>Run speed test</strong>. To test the SIM inside your 5G router, connect to the router’s Wi‑Fi—the results measure the full route: router cellular link plus Wi‑Fi.</p></article></section>
-    <section class="card notice"><strong>Important:</strong> “3G”, “4G”, or “5G” shown by browsers is only an estimate of connection quality. This app now labels the connection as <strong>Wi‑Fi</strong> when your device reports Wi‑Fi, instead of incorrectly treating the estimate as your router’s cellular generation.</section>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">C</div>
+        <div>
+          <p class="eyebrow">Nigeria call checker</p>
+          <h1>CallCheck</h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="app">
+      <section class="card hero">
+        <div class="statusWrap">
+          <div class="tag">Call readiness</div>
+          <h2 id="readiness">Checking…</h2>
+          <p class="sub" id="summary">We are measuring your current connection quality and estimating whether calls are likely to work.</p>
+        </div>
+        <button class="button" id="testBtn">Check now</button>
+      </section>
+
+      <section class="card controls">
+        <label>
+          Select your SIM / network
+          <select id="provider">
+            <option value="MTN">MTN</option>
+            <option value="Airtel">Airtel</option>
+            <option value="Glo">Glo</option>
+            <option value="9mobile">9mobile</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
+
+        <label>
+          Current path
+          <select id="pathMode">
+            <option value="auto">Auto</option>
+            <option value="mobile">Mobile data</option>
+            <option value="wifi">Wi‑Fi</option>
+          </select>
+        </label>
+
+        <button class="secondary" id="locBtn">Use my location</button>
+      </section>
+
+      <section class="metrics">
+        <article class="card metric">
+          <div class="label">Download</div>
+          <div class="value" id="download">--</div>
+          <div class="unit">Mbps</div>
+        </article>
+        <article class="card metric">
+          <div class="label">Upload</div>
+          <div class="value" id="upload">--</div>
+          <div class="unit">Mbps</div>
+        </article>
+        <article class="card metric">
+          <div class="label">Ping</div>
+          <div class="value" id="ping">--</div>
+          <div class="unit">ms</div>
+        </article>
+        <article class="card metric">
+          <div class="label">Connection</div>
+          <div class="value" id="type">--</div>
+          <div class="unit">current route</div>
+        </article>
+      </section>
+
+      <section class="details">
+        <article class="card">
+          <h3>Signal details</h3>
+          <div class="row"><span>Provider</span><strong id="providerValue">--</strong></div>
+          <div class="row"><span>Browser estimate</span><strong id="effective">--</strong></div>
+          <div class="row"><span>Estimated downlink</span><strong id="downlink">--</strong></div>
+          <div class="row"><span>Location</span><strong id="location">Not enabled</strong></div>
+        </article>
+
+        <article class="card">
+          <h3>Best network in your area</h3>
+          <div class="row"><span>Suggested network</span><strong id="bestNetwork">--</strong></div>
+          <div class="row"><span>Coverage rating</span><strong id="coverageRating">--</strong></div>
+          <div class="row"><span>Call readiness</span><strong id="callReadiness">--</strong></div>
+          <div class="row"><span>Notes</span><strong id="notes">--</strong></div>
+        </article>
+      </section>
+
+      <section class="notice">
+        <strong>Important:</strong> this app estimates quality using your browser and current internet path. A website cannot directly read the SIM card's radio signal or the tower signal strength from the phone. For the most accurate mobile-signal check, use a real Android app with access to the phone's radio status, because browser-only checks can only estimate quality.
+      </section>
+    </div>
   </main>
+
   <script>
-    const $=id=>document.getElementById(id), connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
-    function connectionLabel(){const type=connection&&connection.type;if(type==='wifi'||type==='ethernet')return type==='wifi'?'Wi‑Fi':'Ethernet';if(type==='cellular')return 'Mobile';return navigator.onLine?'Online':'Offline'}
-    function showConnection(){ $('type').textContent=connectionLabel(); if(!connection){$('effective').textContent='Unavailable';$('downlink').textContent='Unavailable';return} $('effective').textContent=(connection.effectiveType||'Unknown')+' (estimate)';$('downlink').textContent=connection.downlink?connection.downlink+' Mbps':'Unknown'}
-    function mbps(bytes,ms){return bytes*8/(ms/1000)/1000000}
-    async function ping(){const start=performance.now();await fetch('https://www.cloudflare.com/cdn-cgi/trace?x='+Date.now(),{cache:'no-store'});return Math.round(performance.now()-start)}
-    async function download(){const start=performance.now();const response=await fetch('https://speed.cloudflare.com/__down?bytes=2000000&x='+Date.now(),{cache:'no-store'});const data=await response.arrayBuffer();return mbps(data.byteLength,performance.now()-start)}
-    async function upload(){const body=new Blob([new Uint8Array(500000)]);const start=performance.now();await fetch('https://httpbin.org/post?x='+Date.now(),{method:'POST',body,mode:'cors'});return mbps(body.size,performance.now()-start)}
-    async function test(){const button=$('test');button.disabled=true;button.textContent='Testing…';$('status').textContent='Testing connection…';$('summary').textContent='Please wait while your browser checks the network currently in use.';try{const [p,d,u]=await Promise.all([ping(),download(),upload()]);$('download').textContent=d.toFixed(2);$('upload').textContent=u.toFixed(2);$('ping').textContent=p;$('browserPing').textContent=p+' ms';const label=d>=100?'Excellent':d>=25?'Good':d>=10?'Fair':'Weak';$('status').textContent=label;$('status').className='status';$('summary').textContent=`${connectionLabel()} measured ${d.toFixed(2)} Mbps down, ${u.toFixed(2)} Mbps up, with ${p} ms ping.`;showConnection()}catch(error){$('status').textContent='Test unavailable';$('summary').textContent='Your browser or network blocked the test. Check that you are online, then try again.';console.error(error)}finally{button.disabled=false;button.textContent='Run speed test'}}
-    $('test').addEventListener('click',test);if(connection)connection.addEventListener?.('change',showConnection);showConnection();
+    const $ = (id) => document.getElementById(id);
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const providerSelect = $('provider');
+    const testBtn = $('testBtn');
+    const locBtn = $('locBtn');
+
+    let currentLocation = null;
+
+    const nigeriaZones = [
+      { name: 'Lagos', lat: 6.5244, lon: 3.3792, ranking: ['MTN', 'Airtel', 'Glo', '9mobile'] },
+      { name: 'Abuja', lat: 9.0765, lon: 7.3986, ranking: ['MTN', 'Airtel', 'Glo', '9mobile'] },
+      { name: 'Port Harcourt', lat: 4.8156, lon: 7.0498, ranking: ['MTN', 'Airtel', 'Glo', '9mobile'] },
+      { name: 'Ibadan', lat: 7.3775, lon: 3.9470, ranking: ['MTN', 'Airtel', 'Glo', '9mobile'] },
+      { name: 'Kano', lat: 12.0022, lon: 8.5920, ranking: ['MTN', 'Airtel', 'Glo', '9mobile'] },
+      { name: 'Enugu', lat: 6.5244, lon: 7.4954, ranking: ['MTN', 'Airtel', 'Glo', '9mobile'] },
+      { name: 'Kaduna', lat: 10.5167, lon: 7.4383, ranking: ['MTN', 'Airtel', 'Glo', '9mobile'] },
+      { name: 'Default', lat: 0, lon: 0, ranking: ['MTN', 'Airtel', 'Glo', '9mobile'] }
+    ];
+
+    function getConnectionMode() {
+      const mode = $('pathMode').value;
+      if (mode !== 'auto') return mode;
+      if (!connection) return 'Unknown';
+      if (connection.type === 'wifi') return 'Wi‑Fi';
+      if (connection.type === 'cellular') return 'Mobile';
+      return 'Online';
+    }
+
+    function getCallReadiness(downloadMbps, uploadMbps, pingMs) {
+      if (downloadMbps >= 20 && uploadMbps >= 8 && pingMs <= 80) return 'Excellent';
+      if (downloadMbps >= 8 && uploadMbps >= 4 && pingMs <= 140) return 'Good';
+      if (downloadMbps >= 2 && uploadMbps >= 1 && pingMs <= 220) return 'Fair';
+      return 'Weak';
+    }
+
+    function formatMbs(value) {
+      if (typeof value !== 'number' || Number.isNaN(value)) return '0.00';
+      return value.toFixed(2);
+    }
+
+    function getCoverageEstimate() {
+      const selected = providerSelect.value;
+      const locationText = currentLocation ? `${currentLocation.latitude.toFixed(4)}, ${currentLocation.longitude.toFixed(4)}` : 'Not enabled';
+      const region = currentLocation ? findNearestNigeriaZone(currentLocation.latitude, currentLocation.longitude) : 'Default';
+      const ranking = nigeriaZones.find(z => z.name === region)?.ranking || nigeriaZones[nigeriaZones.length - 1].ranking;
+
+      const index = ranking.indexOf(selected);
+      const suggested = index === -1 ? ranking[0] : ranking[0];
+
+      const best = suggested;
+      const coverageRating = selected === best ? 'Strong' : (ranking.indexOf(selected) <= 1 ? 'Good' : 'Average');
+      const note = selected === best ? 'This network is usually the strongest choice in this area.' : 'This network may be weaker here; test with another provider when calling.';
+
+      $('bestNetwork').textContent = best;
+      $('coverageRating').textContent = coverageRating;
+      $('notes').textContent = note;
+      $('location').textContent = locationText;
+      $('providerValue').textContent = selected;
+    }
+
+    function findNearestNigeriaZone(lat, lon) {
+      let closest = nigeriaZones[0];
+      let shortest = Number.MAX_SAFE_INTEGER;
+
+      for (const zone of nigeriaZones) {
+        const distance = Math.hypot(lat - zone.lat, lon - zone.lon);
+        if (distance < shortest) {
+          shortest = distance;
+          closest = zone;
+        }
+      }
+
+      return closest.name;
+    }
+
+    function showConnectionInfo() {
+      const mode = getConnectionMode();
+      $('type').textContent = mode;
+      if (!connection) {
+        $('effective').textContent = 'Unavailable';
+        $('downlink').textContent = 'Unavailable';
+        return;
+      }
+      const estimate = connection.effectiveType || 'Unknown';
+      $('effective').textContent = estimate;
+      $('downlink').textContent = connection.downlink ? `${connection.downlink} Mbps` : 'Unknown';
+    }
+
+    async function quickPing() {
+      const start = performance.now();
+      await fetch('https://www.cloudflare.com/cdn-cgi/trace?x=' + Date.now(), { cache: 'no-store' });
+      return Math.round(performance.now() - start);
+    }
+
+    async function quickDownload() {
+      const start = performance.now();
+      const response = await fetch('https://speed.cloudflare.com/__down?bytes=1500000&x=' + Date.now(), { cache: 'no-store' });
+      const data = await response.arrayBuffer();
+      const size = data.byteLength;
+      return (size * 8) / ((performance.now() - start) / 1000) / 1000000;
+    }
+
+    async function quickUpload() {
+      const payload = new Blob([new Uint8Array(500000)]);
+      const start = performance.now();
+      await fetch('https://httpbin.org/post?x=' + Date.now(), {
+        method: 'POST',
+        body: payload,
+        mode: 'cors'
+      });
+      const elapsedSeconds = (performance.now() - start) / 1000;
+      return (payload.size * 8) / elapsedSeconds / 1000000;
+    }
+
+    function setReadinessText(label, summary) {
+      $('readiness').textContent = label;
+      $('summary').textContent = summary;
+      const colorMap = {
+        Excellent: '#32d399',
+        Good: '#60a5fa',
+        Fair: '#fbbf24',
+        Weak: '#f87171'
+      };
+      $('readiness').style.color = colorMap[label] || '#fff';
+    }
+
+    function evaluateCallRisk(downloadMbps, uploadMbps, pingMs) {
+      const label = getCallReadiness(downloadMbps, uploadMbps, pingMs);
+      const summaryMap = {
+        Excellent: 'Excellent. Your current connection looks stable enough for clear calls and video use.',
+        Good: 'Good. Calls should usually work well, but quality may dip in busy periods.',
+        Fair: 'Fair. Calls may work, but some drops or weak voice quality are possible.',
+        Weak: 'Weak. Avoid making important calls right now unless you have a stronger connection.'
+      };
+      return { label, text: summaryMap[label] || summaryMap.Weak };
+    }
+
+    async function runCheck() {
+      testBtn.disabled = true;
+      testBtn.textContent = 'Checking…';
+
+      $('download').textContent = '--';
+      $('upload').textContent = '--';
+      $('ping').textContent = '--';
+      setReadinessText('Checking…', 'Testing your internet quality and current call-readiness now.');
+
+      try {
+        const [pingMs, downloadMbps, uploadMbps] = await Promise.all([
+          quickPing(),
+          quickDownload(),
+          quickUpload()
+        ]);
+
+        const downloadVal = Number(downloadMbps) || 0;
+        const uploadVal = Number(uploadMbps) || 0;
+        const pingVal = Number(pingMs) || 0;
+
+        $('download').textContent = formatMbs(downloadVal);
+        $('upload').textContent = formatMbs(uploadVal);
+        $('ping').textContent = String(pingVal);
+
+        const result = evaluateCallRisk(downloadVal, uploadVal, pingVal);
+        setReadinessText(result.label, `${result.text} Current speed: ${formatMbs(downloadVal)} Mbps down, ${formatMbs(uploadVal)} Mbps up, ${pingVal} ms ping.`);
+
+        $('callReadiness').textContent = result.label;
+        $('providerValue').textContent = providerSelect.value;
+        getCoverageEstimate();
+      } catch (error) {
+        console.error(error);
+        setReadinessText('Unavailable', 'This device or network blocked the test. Try again after checking your connection.');
+        $('callReadiness').textContent = 'Unknown';
+      } finally {
+        testBtn.disabled = false;
+        testBtn.textContent = 'Check now';
+      }
+    }
+
+    function handleLocation() {
+      if (!navigator.geolocation) {
+        $('location').textContent = 'Not supported';
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition((position) => {
+        currentLocation = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        };
+        $('location').textContent = `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`;
+        getCoverageEstimate();
+      }, () => {
+        $('location').textContent = 'Permission denied';
+      }, { enableHighAccuracy: true, timeout: 10000 });
+    }
+
+    providerSelect.addEventListener('change', () => {
+      $('providerValue').textContent = providerSelect.value;
+      getCoverageEstimate();
+    });
+
+    testBtn.addEventListener('click', runCheck);
+    locBtn.addEventListener('click', handleLocation);
+
+    showConnectionInfo();
+    getCoverageEstimate();
+    setReadinessText('Ready', 'Choose your network and run the check when you want to place a call.');
   </script>
 </body>
 </html>
