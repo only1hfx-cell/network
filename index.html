@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A simple browser-based internet strength checker." />
+  <title>Network Pulse</title>
+  <style>
+    :root{--bg:#07111f;--card:#102038;--text:#edf5ff;--muted:#9cb1cf;--blue:#60a5fa;--green:#34d399;--yellow:#fbbf24;--red:#f87171}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Arial,sans-serif;color:var(--text);background:radial-gradient(circle at top left,#183b67,transparent 38%),var(--bg)}
+    main{max-width:900px;margin:auto;padding:28px 18px 48px}.brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}.logo{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--blue),#4f46e5);font-weight:800;font-size:21px}.eyebrow{margin:0 0 4px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:2px}.brand h1{margin:0;font-size:25px}.card{background:rgba(16,32,56,.92);border:1px solid #ffffff1a;border-radius:22px;box-shadow:0 16px 35px #0004}.hero{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:27px;margin-bottom:20px}.tag{color:var(--green);font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:1.5px}.hero h2{margin:7px 0 8px;font-size:clamp(33px,8vw,56px);letter-spacing:-2px}.hero p{margin:0;color:var(--muted);line-height:1.5}.button{border:0;border-radius:14px;padding:15px 19px;background:linear-gradient(135deg,var(--blue),#4f46e5);color:#fff;font-weight:bold;cursor:pointer;white-space:nowrap}.button:disabled{opacity:.65;cursor:wait}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}.metric{padding:20px}.metric .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px}.value{margin:10px 0 3px;font-size:30px;font-weight:800;letter-spacing:-1px}.unit{color:var(--muted);font-size:12px}.details{display:grid;grid-template-columns:1fr 1fr;gap:16px}.details .card{padding:21px}.details h3{margin:0 0 15px}.row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #ffffff12;color:var(--muted)}.row:last-child{border:0}.row strong{color:var(--text)}.note{color:var(--muted);line-height:1.55;font-size:14px}.status{color:var(--green)}
+    @media(max-width:700px){.hero{display:block}.button{width:100%;margin-top:20px}.metrics{grid-template-columns:repeat(2,1fr)}.details{grid-template-columns:1fr}}
+    @media(max-width:380px){.metrics{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main>
+    <header class="brand"><div class="logo">N</div><div><p class="eyebrow">Internet quality checker</p><h1>Network Pulse</h1></div></header>
+    <section class="card hero"><div><div class="tag">Live signal</div><h2 id="status">Ready to test</h2><p id="summary">Check your download speed, upload speed, and ping.</p></div><button class="button" id="test">Run speed test</button></section>
+    <section class="metrics">
+      <article class="card metric"><div class="label">Download</div><div class="value" id="download">--</div><div class="unit">Mbps</div></article>
+      <article class="card metric"><div class="label">Upload</div><div class="value" id="upload">--</div><div class="unit">Mbps</div></article>
+      <article class="card metric"><div class="label">Ping</div><div class="value" id="ping">--</div><div class="unit">ms</div></article>
+      <article class="card metric"><div class="label">Network</div><div class="value" id="type">--</div><div class="unit">connection</div></article>
+    </section>
+    <section class="details"><article class="card"><h3>Signal details</h3><div class="row"><span>Effective type</span><strong id="effective">--</strong></div><div class="row"><span>Estimated downlink</span><strong id="downlink">--</strong></div><div class="row"><span>Browser latency</span><strong id="browserPing">--</strong></div></article><article class="card"><h3>How to read it</h3><p class="note">100+ Mbps is excellent, 25–100 Mbps is good, 10–25 Mbps is fair, and below 10 Mbps may feel slow. Results are approximate and can change with network traffic.</p></article></section>
+  </main>
+  <script>
+    const $=id=>document.getElementById(id), connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+    function showConnection(){if(!connection){$('type').textContent='Unknown';$('effective').textContent='Unavailable';$('downlink').textContent='Unavailable';return}$('type').textContent=connection.effectiveType||'Unknown';$('effective').textContent=connection.effectiveType||'Unknown';$('downlink').textContent=connection.downlink?connection.downlink+' Mbps':'Unknown'}
+    function mbps(bytes,ms){return (bytes*8/(ms/1000)/1000000).toFixed(2)}
+    async function ping(){const start=performance.now();await fetch('https://www.cloudflare.com/cdn-cgi/trace?x='+Date.now(),{cache:'no-store'});return Math.round(performance.now()-start)}
+    async function download(){const start=performance.now();const response=await fetch('https://speed.cloudflare.com/__down?bytes=2000000&x='+Date.now(),{cache:'no-store'});const data=await response.arrayBuffer();return Number(mbps(data.byteLength,performance.now()-start))}
+    async function upload(){const body=new Blob([new Uint8Array(500000)]);const start=performance.now();await fetch('https://httpbin.org/post?x='+Date.now(),{method:'POST',body,mode:'cors'});return Number(mbps(body.size,performance.now()-start))}
+    async function test(){const button=$('test');button.disabled=true;button.textContent='Testing…';$('status').textContent='Testing connection…';$('summary').textContent='Please wait while your browser checks the network.';try{const [p,d,u]=await Promise.all([ping(),download(),upload()]);$('download').textContent=d.toFixed(2);$('upload').textContent=u.toFixed(2);$('ping').textContent=p;$('browserPing').textContent=p+' ms';let label=d>=100?'Excellent':d>=25?'Good':d>=10?'Fair':'Weak';$('status').textContent=label;$('status').className='status';$('summary').textContent=`Your connection measured ${d.toFixed(2)} Mbps down, ${u.toFixed(2)} Mbps up, with ${p} ms ping.`;showConnection()}catch(error){$('status').textContent='Test unavailable';$('summary').textContent='Your browser or network blocked the test. Check that you are online, then try again.';console.error(error)}finally{button.disabled=false;button.textContent='Run speed test'}}
+    $('test').addEventListener('click',test);showConnection();
+  </script>
+</body>
+</html>
