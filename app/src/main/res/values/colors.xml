@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_500">#4F46E5</color>
+    <color name="blue_400">#60A5FA</color>
+    <color name="green_400">#34D399</color>
+    <color name="amber_400">#FBBF24</color>
+    <color name="red_400">#F87171</color>
+    <color name="bg_dark">#07111F</color>
+    <color name="card_dark">#102038</color>
+    <color name="text_main">#EDF5FF</color>
+    <color name="text_muted">#A7BADB</color>
+</resources>
